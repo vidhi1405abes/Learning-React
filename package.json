@@ -1,0 +1,32 @@
+{
+  "name": "react",
+  "version": "1.0.0",
+  "description": "Learning react",
+  "keywords": [
+    "react"
+  ],
+  "homepage": "https://github.com/vidhi1405abes/Learning-React#readme",
+  "bugs": {
+    "url": "https://github.com/vidhi1405abes/Learning-React/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidhi1405abes/Learning-React.git"
+  },
+  "license": "ISC",
+  "author": "Vidhi Gandhi",
+  "type": "commonjs",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "parcel": "^2.16.4"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "browserslist": [
+    "last 2 versions"
+  ]
+}
