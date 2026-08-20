@@ -2,7 +2,6 @@
   "name": "react",
   "version": "1.0.0",
   "description": "Learning react",
-  
   "keywords": [
     "react"
   ],
@@ -23,7 +22,9 @@
     "build": "parcel build index.html"
   },
   "devDependencies": {
-    "parcel": "^2.16.4"
+    "@parcel/transformer-image": "^2.16.4",
+    "parcel": "^2.16.4",
+    "url": "^0.11.4"
   },
   "dependencies": {
     "react": "^19.2.8",

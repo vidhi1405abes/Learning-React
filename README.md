@@ -1195,3 +1195,277 @@ Similarly:
 > **`.parcel-cache` → saves Parcel's previous work**  
 > **`dist` → final production output**  
 > **Browserslist → tells tools which browsers to support**
+
+# Lecture-3
+# JSX Notes
+
+## What is JSX?
+
+JSX stands for **JavaScript XML**. It's a syntax extension for JavaScript, most commonly used with React, that lets you write HTML-like code directly inside your JavaScript files.
+
+### What it looks like
+
+```jsx
+const element = <h1>Hello, world!</h1>;
+```
+
+Instead of writing this the "vanilla" way:
+
+```javascript
+const element = React.createElement('h1', null, 'Hello, world!');
+```
+
+JSX lets you write markup that looks like HTML but behaves like JavaScript under the hood — it gets compiled (usually by Babel) into regular `React.createElement()` calls.
+
+### Superpowers of JSX
+
+**1. Embed JavaScript expressions directly**
+
+You can drop any JS expression into JSX using curly braces `{}`.
+
+```jsx
+const name = "Priya";
+const element = <h1>Hello, {name}!</h1>;
+```
+
+**2. Combine markup and logic in one place**
+
+No more separating templates and logic into different files — component structure and behavior live together.
+
+```jsx
+function Greeting({ isLoggedIn }) {
+  return isLoggedIn ? <h1>Welcome back!</h1> : <h1>Please sign in.</h1>;
+}
+```
+
+**3. Prevents injection attacks**
+
+React automatically escapes values embedded in JSX before rendering, which helps guard against cross-site scripting (XSS) by default.
+
+**4. It's just JavaScript objects**
+
+JSX compiles down to plain JS objects (React elements), so you get the full power of JS — loops, conditionals, functions — to generate UI declaratively.
+
+```jsx
+const items = ['Apple', 'Banana', 'Cherry'];
+const list = (
+  <ul>
+    {items.map(item => <li key={item}>{item}</li>)}
+  </ul>
+);
+```
+
+**5. Component composition**
+
+You can nest components like HTML tags, making complex UIs easy to build from small, reusable pieces.
+
+```jsx
+<Card>
+  <Header title="Dashboard" />
+  <Body />
+</Card>
+```
+
+**6. Better tooling support**
+
+Because it's structured, JSX gets syntax highlighting, autocomplete, and compile-time error checking (e.g., catching a typo in a tag name) in most modern editors — something plain string-based templates don't offer as easily.
+
+**7. Readability**
+
+For UI-heavy code, JSX often reads more naturally than deeply nested function calls, especially as component trees grow.
+
+### Key things to remember
+
+- JSX isn't valid JS on its own — it needs a compiler (Babel, TypeScript, etc.) to transform it.
+- Every JSX expression must return a single root element (or use a Fragment `<>...</>`).
+- Attributes use camelCase (`className` instead of `class`, `onClick` instead of `onclick`).
+
+---
+
+## Role of the `type` attribute in `<script>` tags
+
+The `type` attribute on a `<script>` tag tells the browser **how to interpret the content** of the script — what language/format it's written in, and how to process it.
+
+### Basic syntax
+
+```html
+<script type="text/javascript">
+  console.log("Hello");
+</script>
+```
+
+### Common values
+
+**1. `text/javascript` (default / classic script)**
+
+```html
+<script type="text/javascript">...</script>
+```
+
+This is the default. If you omit `type` entirely, the browser assumes it's JavaScript anyway — so this is technically optional in modern HTML.
+
+**2. `module` — ES Modules**
+
+```html
+<script type="module">
+  import { greet } from './utils.js';
+  greet();
+</script>
+```
+
+- Enables `import` / `export` syntax
+- Deferred by default (runs after HTML parsing, like `defer`)
+- Runs in strict mode automatically
+- Each module has its own scope (variables don't leak to global scope)
+- CORS rules apply even for local files (often needs a server, not `file://`)
+
+**3. `application/json` — Embedding JSON data**
+
+```html
+<script type="application/json" id="user-data">
+  { "name": "Priya", "age": 25 }
+</script>
+```
+
+Browser won't execute this as code — useful for embedding data that JS reads later via `JSON.parse(document.getElementById('user-data').textContent)`. Common in frameworks (e.g., Next.js uses `application/json` to hydrate data).
+
+**4. `importmap` — Import Maps**
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "lodash": "https://cdn.skypack.dev/lodash"
+  }
+}
+</script>
+```
+
+Lets you use bare module specifiers (like `import _ from "lodash"`) in the browser without a bundler.
+
+**5. Template-related types (non-executing, used by libraries)**
+
+```html
+<script type="text/template">
+  <div>{{message}}</div>
+</script>
+<script type="text/x-handlebars-template">...</script>
+```
+
+Any unrecognized `type` value tells the browser **not to execute** the script as JS — it's just inert text the browser ignores for execution, often used to store template markup that a JS library (like Handlebars or Underscore) reads and processes manually.
+
+**6. `text/babel` / `text/jsx` (older tutorials, dev-only)**
+
+```html
+<script type="text/babel">
+  const el = <h1>Hello</h1>;
+</script>
+```
+
+Used with in-browser Babel transpilation — fine for quick demos, **not for production** (it recompiles JSX on every page load, which is slow).
+
+### Deprecated / legacy values
+
+- `text/vbscript` — VBScript (obsolete, IE-only)
+- `text/ecmascript` — old alias for JS, no longer needed
+
+### Quick rule of thumb
+
+| Value | Purpose |
+|---|---|
+| *(omitted)* or `text/javascript` | Classic JS script |
+| `module` | ES module with import/export |
+| `application/json` | Embed data, not executable |
+| `importmap` | Define module import aliases |
+| anything else (`text/template`, etc.) | Browser ignores it as code — used by libraries as raw text |
+
+---
+
+## `{TitleComponent}` vs `{<TitleComponent/>}` vs `{<TitleComponent><TitleComponent/>}` in JSX
+
+These three look similar but do very different things.
+
+### 1. `{TitleComponent}` — passing the reference itself
+
+```jsx
+function TitleComponent() {
+  return <h1>Title</h1>;
+}
+
+function App() {
+  return <div>{TitleComponent}</div>;
+}
+```
+
+This embeds the **function reference itself** as a JS expression — not a call, not JSX. React does not know what to do with a raw function as a child.
+
+- If `TitleComponent` is a regular function component, React will **throw an error**:
+  > Error: Functions are not valid as a React child.
+- This pattern is only valid when you're passing the component as a **prop** to be rendered later, e.g.:
+  ```jsx
+  <SomeWrapper icon={TitleComponent} />
+  ```
+  and internally `SomeWrapper` does `<props.icon />` to actually render it.
+
+So `{TitleComponent}` by itself in JSX output = **broken**, unless something downstream calls it.
+
+### 2. `{<TitleComponent/>}` — rendering an instance
+
+```jsx
+function App() {
+  return <div>{<TitleComponent />}</div>;
+}
+```
+
+Here `<TitleComponent />` is JSX syntax, which compiles to `React.createElement(TitleComponent)` — a **React element object**. Wrapping it in `{}` just embeds that expression, which is exactly what JSX children expect.
+
+This works, but it's **redundant** — `{<TitleComponent/>}` and just `<TitleComponent/>` produce the same result. You'd normally only wrap it in `{}` if it's part of a larger expression:
+
+```jsx
+<div>{condition ? <TitleComponent /> : null}</div>
+```
+
+Equivalent simpler version:
+
+```jsx
+<div><TitleComponent /></div>
+```
+
+### 3. `{<TitleComponent><TitleComponent/>}` — malformed / likely a typo
+
+This one as written is actually **invalid JSX** — the outer `<TitleComponent>` tag is opened but never closed (`</TitleComponent>` is missing; the `/>` closes the *inner* one only). This would throw a syntax/parse error.
+
+You probably meant one of these:
+
+**a) Self-closing, standalone (no nesting):**
+
+```jsx
+{<TitleComponent />}
+```
+
+**b) Component nested as a child (composition):**
+
+```jsx
+{<TitleComponent><TitleComponent /></TitleComponent>}
+```
+
+This is valid *if* `TitleComponent` is designed to accept and render `children`:
+
+```jsx
+function TitleComponent({ children }) {
+  return <h1>{children}</h1>;
+}
+```
+
+Then this would render a `<TitleComponent>` whose child is *another* `<TitleComponent>` instance — nested recursively. Only makes sense if that's intentional (e.g., a wrapper/layout component).
+
+### Summary table
+
+| Expression | What it is | Result |
+|---|---|---|
+| `{TitleComponent}` | Raw function reference | ❌ Error if rendered directly as a child |
+| `{<TitleComponent/>}` | React element (JSX call) | ✅ Renders the component |
+| `{<TitleComponent><TitleComponent/>}` | Malformed JSX (unclosed tag) | ❌ Syntax error |
+| `{<TitleComponent><TitleComponent/></TitleComponent>}` | Nested component as children | ✅ Valid *if* it accepts `children` |
+
+**Rule of thumb:** In JSX, always use `<ComponentName />` (with angle brackets) to *render* a component. Use the bare `ComponentName` (no brackets) only when passing it as a *reference* — like a prop — for someone else to render later.
