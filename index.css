@@ -4,4 +4,39 @@
 .header{
     display: flex;
     justify-content: space-between;
+    border:1px solid black;
+}
+.navItems{
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    margin-right: 10px;
+}
+.navItems>li{
+    padding:10px;
+    font-size: 20px;
+    margin:10px;
+}
+.restaurantCard{
+    height:300px;
+    width:200px;
+    
+    padding:5px;
+    background-color: rgba(173, 168, 168, 0.959);
+    margin: 10px;
+}
+.restaurantImage{
+    height:130px;
+    width:200px;
+    
+}
+.restaurantCard:hover{
+    border: 1px solid black;
+    cursor: pointer;
+    
+}
+.restaurantContainer{
+    display: flex;
+    flex-wrap: wrap;
+    
 }

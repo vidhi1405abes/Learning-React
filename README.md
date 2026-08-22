@@ -1469,3 +1469,191 @@ Then this would render a `<TitleComponent>` whose child is *another* `<TitleComp
 | `{<TitleComponent><TitleComponent/></TitleComponent>}` | Nested component as children | ✅ Valid *if* it accepts `children` |
 
 **Rule of thumb:** In JSX, always use `<ComponentName />` (with angle brackets) to *render* a component. Use the bare `ComponentName` (no brackets) only when passing it as a *reference* — like a prop — for someone else to render later.
+# React-04
+# React Basics — Q&A Notes
+
+## 1. Is JSX mandatory for React?
+No. JSX is just a nicer way to write code that looks like HTML inside JavaScript. Behind the scenes, React converts JSX into plain JavaScript function calls.
+
+```jsx
+// JSX
+const element = <h1>Hello</h1>;
+
+// Same thing without JSX
+const element = React.createElement('h1', null, 'Hello');
+```
+
+You *could* skip JSX and use `React.createElement()` everywhere, but almost nobody does — JSX is easier to read and write.
+
+**In short:** JSX = optional but strongly recommended.
+
+---
+
+## 2. Is ES6 mandatory for React?
+No, but it's used everywhere in real projects.
+
+ES6 (2015) added features like:
+- `let` / `const`
+- Arrow functions: `() => {}`
+- Classes: `class MyComponent extends React.Component`
+- Destructuring: `const { name } = props`
+- Import/export: `import React from 'react'`
+
+React itself doesn't force ES6 syntax, but modern tools (Create React App, Vite) and all documentation assume you're using it.
+
+**In short:** ES6 is optional but everyone uses it because it makes React code shorter and cleaner.
+
+---
+
+## 3. How to write comments in JSX?
+Normal `//` comments don't work directly inside JSX markup — they get rendered as text.
+
+```jsx
+function App() {
+  return (
+    <div>
+      {/* This is a comment in JSX */}
+      <h1>Hello</h1>
+    </div>
+  );
+}
+```
+
+- Inside JSX markup → use `{/* comment */}`
+- Outside JSX (regular JS) → use `//` or `/* */` as usual
+
+---
+
+## 4. What is `<React.Fragment>` and `<></>`?
+They let you group multiple elements **without adding an extra HTML element** to the page.
+
+React components can only return **one** parent element. Instead of wrapping everything in an unnecessary `<div>`, use a Fragment:
+
+```jsx
+function App() {
+  return (
+    <React.Fragment>
+      <h1>Hello</h1>
+      <p>Welcome</p>
+    </React.Fragment>
+  );
+}
+```
+
+Shorthand:
+```jsx
+function App() {
+  return (
+    <>
+      <h1>Hello</h1>
+      <p>Welcome</p>
+    </>
+  );
+}
+```
+
+**Difference:** `<></>` can't take a `key` prop; `<React.Fragment key={...}>` can — needed when rendering fragments inside a loop.
+
+---
+
+## 5. What is the Virtual DOM?
+A lightweight, in-memory copy of the real DOM that React uses to figure out the fastest way to update the actual webpage.
+
+**Why it's needed:** Directly updating the real DOM every time something changes is slow, especially in big apps.
+
+**How it works:**
+1. React creates a **new** Virtual DOM tree when data changes.
+2. It compares the new tree to the **previous** one (**diffing**).
+3. React updates **only the changed parts** in the real DOM.
+
+**Analogy:** Instead of reprinting a whole document because one word changed, you just erase and rewrite that one word.
+
+---
+
+## 6. What is Reconciliation in React?
+Reconciliation is the process React uses to compare the old and new Virtual DOM trees and update the real DOM efficiently — it's the official name for the "diffing" step.
+
+**Steps:**
+1. Something changes (state/props).
+2. React creates a new Virtual DOM tree.
+3. It compares the new tree to the previous one.
+4. It calculates the minimum number of changes needed.
+5. It updates only those parts in the real DOM.
+
+**Diffing rules:**
+- **Different element types** (`<div>` → `<span>`) → old one is removed, new one created.
+- **Same element type** → React keeps it, just updates changed attributes.
+- **Lists** → React uses the `key` prop to track which items moved, were added, or removed.
+
+**Analogy:** Like proofreading two drafts of an essay — you only fix the sentences that changed, not retype the whole thing.
+
+---
+
+## 7. What is React Fiber?
+Fiber is the internal engine (introduced in React 16) that powers reconciliation — a rewrite of how React processes updates internally.
+
+**The old problem (React 15 and earlier):** Diffing happened all at once, blocking the browser until it finished — big updates could make the page feel frozen or janky.
+
+**What Fiber does differently:** It breaks rendering work into small units, so React can:
+1. Pause work
+2. Resume it later
+3. Prioritize urgent updates (like typing) over less urgent ones
+4. Abort work that's no longer needed
+
+**Analogy:** Instead of finishing a whole pile of dishes before doing anything else, you can pause to handle something urgent and come back to the dishes later.
+
+**Why it matters:** Fiber is the foundation for Concurrent Mode and features like `startTransition`.
+
+---
+
+## 8. Why do we need keys in React? When do we need them?
+Keys help React track which list items changed, were added, or removed — without them, React can only guess based on position, which causes bugs.
+
+```jsx
+{items.map(item => <li key={item.id}>{item.name}</li>)}
+```
+
+**Without keys, example problem:**
+List `[Apple, Banana, Cherry]` → delete "Banana" (middle item).
+Without keys, React compares by position and thinks Banana's *text* changed to Cherry, then removes Cherry — doing unnecessary/wrong work. This gets worse with input fields or state inside list items.
+
+**With keys**, React matches by identity, not position, so updates are accurate and efficient.
+
+**When keys are needed:**
+- Rendering lists dynamically with `.map()`
+- Rendering arrays of components
+- Using `React.Fragment` inside a loop (key goes on the Fragment)
+
+**Rules for good keys:**
+- ✅ Use something unique and stable (e.g., a database `id`)
+- ❌ Avoid array index if the list can reorder, or have items inserted/deleted
+- Index is only okay if the list is static and never changes
+
+---
+
+## 9. Can we use index as keys in React?
+Yes, technically — React won't throw an error. But it's only safe in specific cases.
+
+**Okay to use index when:**
+- The list is static (never reorders, no items added/removed)
+- List items have no internal state (no inputs, checkboxes, etc.)
+- No unique IDs are available at all (last resort)
+
+```jsx
+// Fine — static list, never changes
+const days = ['Mon', 'Tue', 'Wed'];
+{days.map((day, index) => <li key={index}>{day}</li>)}
+```
+
+**Risky when:**
+- The list can be reordered, filtered, or items added/removed from the middle
+- List items hold their own state (inputs, toggles, etc.)
+
+**Example bug:** With `[Apple, Banana, Cherry]` and inputs keyed by index, typing into Banana's input then deleting "Apple" shifts indices — React reuses DOM nodes by position, so the typed text stays attached to the wrong item.
+
+**Fix:** Use a stable unique key like `item.id` instead of index.
+
+**In short:**
+- ✅ Index as key — fine for static, never-changing, stateless lists
+- ❌ Index as key — risky for dynamic lists or list items with state
+- ✅ Best practice — always use a unique, stable ID when available
