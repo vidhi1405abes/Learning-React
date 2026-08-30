@@ -1,148 +1,3 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import logo from "url:./logo.jpg";
-import user from "url:./user.png";
-import logoFood from "url:./logoProject.jpg";
-
-// const heading = React.createElement(
-//   "h1",
-//   { id: "heading" },
-//   "Hello World from React",
-// );
-{
-  /* <div id="grandParent">
-    <div id="parent">
-        <h1 id="child">Hello world from child</h1>
-    </div>
-</div> */
-}
-// const parent=React.createElement("div",{id:"grandParent"},React.createElement("div",{id:"parent"},React.createElement("h1",{id:"child"},"Hello world from child")))
-{
-  /* <div id="grandParent">
-    <div id="parent1">
-        <h1 id="child1">Child1</h1>
-        <h2 id="child2">Child2</h2>
-    </div>
-    <div id="parent2">
-        <h1 id="child3">Child3</h1>
-        <h2 id="child4">Child4</h2>
-    </div>
-</div> */
-}
-// const grandParent = React.createElement("div", { id: "grandParent" }, [
-//   React.createElement("div", { id: "parent1" }, [
-//     React.createElement("h1", { id: "child1" }, "Child1"),
-//     React.createElement("h2", { id: "child2" }, "Child2"),
-//   ]),
-//   React.createElement("div", { id: "parent2" }, [
-//     React.createElement("h1", { id: "child3" }, "Child3"),
-//     React.createElement("h2", { id: "child4" }, "Child4"),
-//   ]),
-// ]);
-// const root = ReactDOM.createRoot(document.getElementById("root"));
-
-// root.render(grandParent);
-// console.log(heading);
-// const heading=React.createElement("h1",{id:"heading"},"Hiiii");
-// console.log(heading);
-// const HeadingComponent=()=>{
-//   return <h1>This is a React Component</h1>
-// }
-// const num=1000;
-// const TitleComponent=()=>{
-//   return (<div>
-//     <h1>{num}</h1>
-//     <HeadingComponent/>
-//     <h1>I am the title Component</h1>
-//   </div>);
-// }
-// const jsxHeading = <h1 className="head">Hii from JSX</h1>;
-// // const componeent=React.createElement("div",{class:"title"},[React.createElement("h1",{id:"heading"},"Hello World from React"),React.createElement("h2",{id:"subheading"},"This is a subheading"),React.createElement("h3",{id:"subsubheading"},"This is a subsubheading")])
-// const component=(<div className="title">
-//     <h1 id="heading">Hello World from React JSX</h1>
-//     <h2 id="subheading">This is a subheading</h2>
-//     <h3 id="subsubheading">This is a subsubheading</h3>
-// </div>)
-// const Component1=()=>{
-//     return (<h1 className="Child1">I am h1</h1>);
-// }
-// const Component2=()=>{
-//     return (<h1 className="Child2">I am h2</h1>);
-// }
-// const Component3=()=>{
-//     return (<h1 className="Child3">I am h3</h1>);
-// }
-// const Component=()=>{
-//     return (<div className="title">
-//         <Component1/>
-//         <Component2/>
-//         <Component3/>
-//     </div>)
-// }
-// const Logo=()=>{
-//     return (
-//         <img src={logo} alt="My Logo" width="200" height="150"/>
-//     )
-// }
-// const SeacrBar=()=>{
-//     return (
-//         <form>
-//             <input type="string" placeholder="Search.."/>
-//             <button>Submit</button>
-//         </form>
-//     )
-// }
-// const User=()=>{
-//     return (
-//         <img src={user} width="100" height="100"/>
-//     )
-// }
-// const Header=()=>{
-//     return (
-//         <div className="header">
-//             <Logo/>
-//             <SeacrBar/>
-//             <User/>
-//         </div>
-//     )
-// }
-// const root = ReactDOM.createRoot(document.getElementById("root"));
-// root.render(<Header/>);
-/*
-header
-    logo
-    navitems
-        home
-        aboutus
-        cart
-body
-    search-bar
-    restaurantContainer
-        restaurantCard
-
-footer 
-    copyright
-    links
-    address
-    contact
-*/
-const Header = () => {
-  return (
-    <div className="header">
-      <div className="logoContainer">
-        <img src={logoFood} className="logo" width="100" height="100" />
-      </div>
-      <div className="navitemsContainer">
-        <ul className="navItems">
-          <li>Home</li>
-          <li>AboutUs</li>
-          <li>ContactUs</li>
-          <li>Cart</li>
-        </ul>
-      </div>
-    </div>
-  );
-};
 const resObj = [
   {
     info: {
@@ -277,7 +132,7 @@ const resObj = [
       areaName: "West End",
       costForTwo: "₹200 for two",
       cuisines: ["Desserts", "Ice Cream", "Bakery"],
-      avgRating: 4.6,
+      avgRating: 3.6,
       avgRatingString: "4.6",
       totalRatingsString: "7K+ ratings",
       veg: true,
@@ -302,7 +157,7 @@ const resObj = [
       areaName: "Uptown",
       costForTwo: "₹800 for two",
       cuisines: ["Japanese", "Sushi", "Asian"],
-      avgRating: 4.8,
+      avgRating: 3.8,
       avgRatingString: "4.8",
       totalRatingsString: "5K+ ratings",
       veg: false,
@@ -327,7 +182,7 @@ const resObj = [
       areaName: "South Bangalore",
       costForTwo: "₹300 for two",
       cuisines: ["South Indian", "Dosa", "Idli"],
-      avgRating: 4.5,
+      avgRating: 3.5,
       avgRatingString: "4.5",
       totalRatingsString: "11K+ ratings",
       veg: true,
@@ -352,7 +207,7 @@ const resObj = [
       areaName: "Tech Hub",
       costForTwo: "₹450 for two",
       cuisines: ["Italian", "Pasta", "Continental"],
-      avgRating: 4.1,
+      avgRating: 1.1,
       avgRatingString: "4.1",
       totalRatingsString: "6K+ ratings",
       veg: false,
@@ -368,48 +223,4 @@ const resObj = [
     },
   },
 ];
-const RestaurantCard = (props) => {
-  const { resData } = props;
-  const {name,cloudinaryImageId,avgRating,cuisines} = resData;
-
-  return (
-    <div className="restaurantCard">
-      <div className="imageContainer">
-        <img className="restaurantImage" src={cloudinaryImageId} />
-      </div>
-      <div className="restaurantDetails">
-        <h3 className="title">{name}</h3>
-        {console.log(cuisines)
-        }
-        <h4 className="cuisine">{cuisines.join(", ")}</h4>
-        <h4 className="rating">{avgRating}</h4>
-        <h4 className="time">{resData.sla.deliveryTime}</h4>
-      </div>
-    </div>
-  );
-};
-const Body = () => {
-  return (
-    <div className="body">
-      <div className="searchContainer">
-        <input className="searchBar" placeholder="Search Restaurants" />
-      </div>
-      <div className="restaurantContainer">
-        {resObj.map((restaurant) => (
-          <RestaurantCard key={restaurant.info.id} resData={restaurant.info} />
-        ))}
-      </div>
-    </div>
-  );
-};
-const AppLayout = () => {
-  return (
-    <div className="app">
-      <Header />
-      <Body />
-      {/* //footer  */}
-    </div>
-  );
-};
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<AppLayout />);
+export default resObj;

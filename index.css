@@ -40,3 +40,14 @@
     flex-wrap: wrap;
     
 }
+.topRatedBtn{
+    padding:10px;
+}
+.filterBtn{
+    padding: 10px;
+    background-color: green;
+}
+.filterBtn:hover{
+    cursor: pointer;
+    background-color: aliceblue;
+}
