@@ -1657,3 +1657,247 @@ const days = ['Mon', 'Tue', 'Wed'];
 - ✅ Index as key — fine for static, never-changing, stateless lists
 - ❌ Index as key — risky for dynamic lists or list items with state
 - ✅ Best practice — always use a unique, stable ID when available
+# JS & React Concepts — Quick Notes
+
+## What is a Microservice?
+
+A **microservice architecture** splits an application into small, independent services, each doing one job (login, payments, search, etc.) and talking to each other over the network.
+
+- Each service can be built, deployed, and scaled on its own.
+- If one service breaks, the others keep running.
+- Contrast with a **monolith**, where everything runs as one big program.
+
+Analogy: instead of one giant kitchen cooking everything, think of a food court — separate stalls for orders, cooking, salad, dessert, and delivery. If one stall closes, the rest keep serving.
+
+---
+
+## What is Monolithic Architecture?
+
+A **monolith** means the entire app is built and run as **one single, unified program**.
+
+**Key traits:**
+- One codebase — all features live together and are usually deployed together.
+- Shared resources — typically one database, one running process.
+- Simple to start — easy to build/test/deploy early on.
+- Tightly coupled — a change in one area can affect others.
+
+**Downsides:**
+- One crash/bug can take down the *entire* app.
+- Harder to update, scale, or understand as it grows.
+- To scale, you usually have to scale the *whole* app, not just the busy part.
+
+Monoliths aren't "bad" — great for smaller apps or early-stage projects where simplicity matters more than independent scaling.
+
+---
+
+## Why Do We Need `useEffect`?
+
+React's job is to turn data into UI. But apps also need **side effects** — things outside of rendering, like:
+
+- Fetching data from an API
+- Setting up subscriptions (e.g. WebSocket)
+- Manually changing the DOM (e.g. document title)
+- Timers (`setTimeout`, `setInterval`)
+- Logging/analytics
+
+`useEffect` gives you a controlled place to run this code, and a **dependency array** to control *when* it runs:
+
+```jsx
+useEffect(() => {
+  fetchData();
+}, []); // runs once, after first render
+```
+
+- `[]` → runs once, on mount
+- `[count]` → runs when `count` changes
+- no array → runs after every render (rarely desired)
+
+**Cleanup** avoids memory leaks (e.g. clearing timers, removing listeners):
+
+```jsx
+useEffect(() => {
+  const timer = setInterval(() => console.log("tick"), 1000);
+  return () => clearInterval(timer);
+}, []);
+```
+
+### Can't API calls happen without `useEffect`?
+
+Yes — the call itself doesn't need `useEffect`. It depends on **when** it should run:
+
+- **User-triggered** (button click, form submit) → call it directly in the event handler, no `useEffect` needed.
+- **Automatic on mount** (load data as soon as component appears) → use `useEffect`, since there's no user event to hook into.
+
+Calling `fetch` directly in the component body (outside `useEffect` or a handler) is a problem: it runs on *every render*, and if it updates state, that can cause an **infinite loop**.
+
+---
+
+## What is Optional Chaining (`?.`)?
+
+Lets you safely access nested properties **without crashing** if something along the way is `null`/`undefined`.
+
+```js
+const user = { name: "Alex" };
+console.log(user.address.city); // ❌ Error
+console.log(user?.address?.city); // ✅ undefined, no crash
+```
+
+Old way (verbose):
+```js
+if (user && user.address && user.address.city) { ... }
+```
+
+Works with function calls and arrays too:
+```js
+user.greet?.();      // only calls greet() if it exists
+users?.[0]?.name;     // safely get first user's name
+```
+
+### Breaking down `users?.[0]?.name`
+
+1. `users?.` → checks if `users` exists. If not, stop and return `undefined`.
+2. `[0]` → get the first item in the array (only runs if `users` existed).
+3. `?.name` → checks if that first item exists, then gets `.name`. If not, return `undefined`.
+
+Examples:
+```js
+let users = [{ name: "Alex" }, { name: "Sam" }];
+users?.[0]?.name; // "Alex"
+
+let users = [];
+users?.[0]?.name; // undefined (empty array, no crash)
+
+let users = undefined;
+users?.[0]?.name; // undefined (users doesn't exist, no crash)
+```
+
+Equivalent long-hand: `users && users[0] && users[0].name`
+
+---
+
+## What is Shimmer UI?
+
+The gray, animated "loading placeholder" shown while content loads — instead of a blank screen or spinner. Also called **Skeleton Screens / Skeleton Loading**.
+
+**Why used:**
+- **Feels faster** — user sees something immediately.
+- **Reduces layout shift** — placeholders are shaped like the real content, so nothing jumps around later.
+- **Better than blank/spinner** — hints at what's coming.
+
+**Seen in:** Facebook/LinkedIn feed loading, YouTube thumbnails, skeleton cards before data loads.
+
+---
+
+## Expression vs Statement
+
+- **Expression** = produces a **value** (`5 + 3`, `"hello"`, `x > 10`, `myFunc()`, `a ? b : c`)
+- **Statement** = an **instruction that does something** (`if`, `for`, `let x = 5;`, function declarations)
+
+Quick test: *Can I put this on the right side of `=`?*
+- Yes → expression (`let a = 5 + 3;` ✅)
+- No → statement (`let a = if (true) {...};` ❌)
+
+Many things are both: `let x = 5;` is a statement, but `5` inside it is an expression. `doSomething();` is an *expression statement*.
+
+---
+
+## What is CORS?
+
+**CORS (Cross-Origin Resource Sharing)** — a browser security rule controlling whether a webpage can request data from a *different* origin (domain).
+
+**Same-Origin Policy:** by default, browsers block requests to a different origin than the current page, to stop malicious sites from stealing data from other sites (like your bank).
+
+**Origin = protocol + domain + port.** All three must match for two URLs to be "same-origin."
+
+The **server** decides who's allowed, via a response header:
+```
+Access-Control-Allow-Origin: https://myapp.com
+```
+
+If missing/not allowed, the browser blocks the response from reaching your JS — even if the server processed it successfully.
+
+**Important:** CORS is fixed on the **server/backend**, not the frontend.
+
+### Same vs Different Origin Examples
+
+| URL 1 | URL 2 | Same Origin? |
+|---|---|---|
+| `https://myapp.com` | `https://myapp.com/page` | ✅ Yes |
+| `https://myapp.com` | `http://myapp.com` | ❌ No (protocol) |
+| `https://myapp.com` | `https://myapp.com:8080` | ❌ No (port) |
+| `https://myapp.com` | `https://blog.myapp.com` | ❌ No (subdomain = different domain) |
+| `http://localhost:3000` | `http://localhost:3000/api` | ✅ Yes |
+| `http://localhost:3000` | `http://localhost:5000` | ❌ No (port) — common in local dev! |
+
+Default ports: `http://` → `80`, `https://` → `443` (so `https://myapp.com` and `https://myapp.com:443` are the same origin).
+
+---
+
+## What is `async`/`await`?
+
+Keywords that make asynchronous code (API calls, timers, etc.) *read* like normal, step-by-step code.
+
+**Old way (`.then()` chains):**
+```js
+fetch("/api/data")
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.log(err));
+```
+
+**With async/await:**
+```js
+async function getData() {
+  try {
+    const res = await fetch("/api/data");
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+```
+
+### `async` = "this function returns a Promise"
+
+Whatever you `return` gets automatically wrapped in a **Promise**:
+
+```js
+async function greet() {
+  return "hello";
+}
+console.log(greet()); // Promise {<fulfilled>: "hello"}, not "hello" directly
+greet().then(value => console.log(value)); // "hello"
+```
+
+If the function throws, it returns a **rejected Promise** instead of crashing — which is why `try...catch` works naturally inside `async` functions.
+
+### `await` = "pause here and wait, then give the result"
+
+`await` only pauses the **current async function**, not the whole app:
+
+```js
+async function getData() {
+  console.log("1. Starting");
+  const res = await fetch("/api/data"); // pauses only here
+  console.log("2. Got response");
+}
+getData();
+console.log("3. This runs immediately!");
+
+// Output order: 1 → 3 → 2
+```
+
+This is what makes JS **non-blocking** — the rest of the program keeps running while one function waits.
+
+`await` also **unwraps** the Promise's value:
+```js
+const res = await fetch("/api/data"); // actual Response object, not a Promise
+```
+
+`await` only works **inside an `async` function** (except for special top-level await in modules).
+
+### Mental model
+
+- `async function` = "I'm placing an order that takes time — here's a receipt (Promise), come back later for the food."
+- `await` = "I'll wait right here for *my* receipt to be ready — but other people in line aren't blocked."
