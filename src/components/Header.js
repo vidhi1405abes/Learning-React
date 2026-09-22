@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logoFood from "url:../../logoProject.jpg";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [btnName, setBtnName] = useState("Login");
+  useEffect(()=>{console.log("Hi");
+  },[])
   return (
     <div className="header">
       <div className="logoContainer">
@@ -10,9 +13,9 @@ const Header = () => {
       </div>
       <div className="navitemsContainer">
         <ul className="navItems">
-          <li>Home</li>
-          <li>AboutUs</li>
-          <li>ContactUs</li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/about">AboutUs</Link></li>
+          <li><Link to="/ContactUs">ContactUs</Link></li>
           <li>Cart</li>
           <button
             className="loginButton"
