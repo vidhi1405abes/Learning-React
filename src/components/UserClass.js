@@ -7,25 +7,31 @@ class UserClass extends React.Component {
     console.log(props);
     this.state = {
       count: 0,
+      userInfo:{
+        name:"dummy",
+        location:"default"
+      }
     };
   }
   async componentDidMount(){
     const data= await fetch("https://api.github.com/users/vidhi1405abes");
     const json=await data.json();
     console.log(json);
-    
+    this.setState({
+      userInfo:json
+    })
     
   }
 
   render() {
-    const { name } = this.props;
-    const { count } = this.state;
-    console.log(name + "rendered");
+    const { name,bio } = this.state.userInfo;
+    
+   
     
     return (
       <div className="infoCard">
         <h1>{name}</h1>
-        <h1>{count}</h1>
+        <h1>{bio}</h1>
         <button
           onClick={() => {
             this.setState({

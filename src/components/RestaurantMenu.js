@@ -3,7 +3,7 @@ import menuMock from "../utils/menuMock";
 import { useParams } from "react-router-dom";
 import Shimmer from "./Shimmer";
 const RestaurantMenu = () => {
-  console.log(useState());
+ 
   
   const {resId}=useParams();
   const [resInfo,setResInfo]= useState(null);
