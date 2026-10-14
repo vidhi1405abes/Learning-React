@@ -1,0 +1,1 @@
+export const image_url="https://media-assets.swiggy.com/swiggy/image/upload/";

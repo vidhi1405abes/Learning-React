@@ -1,14 +1,16 @@
-import React from "react";
+import React, { lazy , Suspense} from "react";
 import ReactDOM from "react-dom/client";
 import logo from "url:../logo.jpg";
 import user from "url:../user.png";
 import Header from "./components/Header";
 import Body from "./components/Body";
-import {createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
-import About from "./components/About";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import ContactUs from "./components/ContactUs";
 import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
+import Shimmer from "./components/Shimmer";
+
+
 // const heading = React.createElement(
 //   "h1",
 //   { id: "heading" },
@@ -131,8 +133,12 @@ footer
     address
     contact
 */
-
-
+const AboutUs=lazy(()=>{
+  return import("./components/About");
+})
+const Grocery = lazy(() => {
+  return import("./components/Grocery");
+});
 
 const AppLayout = () => {
   return (
@@ -143,32 +149,34 @@ const AppLayout = () => {
     </div>
   );
 };
-const appRouter= createBrowserRouter([
+const appRouter = createBrowserRouter([
   {
-    path:"/",
-    element:<AppLayout/>,
-    children:[
-    {
-    path:"/about",
-    element:<About/>,
-
-    },
-    {
-    path:"/contact",
-    element:<ContactUs/>
-    },
-    {
-    path:"/",
-    element:<Body/>
-    },
-    {
-      path:"restaurants/:resId",
-      element:<RestaurantMenu/>
-    }
+    path: "/",
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/about",
+        element: <Suspense fallback={<h1>Loading.....</h1>}><AboutUs /></Suspense>,
+      },
+      {
+        path: "/contact",
+        element: <ContactUs />,
+      },
+      {
+        path: "/",
+        element: <Body />,
+      },
+      {
+        path: "restaurants/:resId",
+        element: <RestaurantMenu />,
+      },
+      {
+        path: "/grocery",
+        element: <Suspense fallback={<Shimmer/>}><Grocery/></Suspense>,
+      },
     ],
-    errorElement:<Error/>
-  }
-  
-])
+    errorElement: <Error />,
+  },
+]);
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<RouterProvider router={appRouter}/>);
+root.render(<RouterProvider router={appRouter} />);

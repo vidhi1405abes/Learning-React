@@ -1,38 +1,42 @@
 import { useEffect, useState } from "react";
-import menuMock from "../utils/menuMock";
 import { useParams } from "react-router-dom";
 import Shimmer from "./Shimmer";
+import useRestaurantMenu from "../utils/useRestaurantMenu";
+import RestaurantCategory from "./RestaurantCategory";
+
 const RestaurantMenu = () => {
- 
-  
-  const {resId}=useParams();
-  const [resInfo,setResInfo]= useState(null);
-  useEffect(()=>{
-    setResInfo(menuMock[resId])
-  },[resId])
-  if(resInfo==null){
-    return <Shimmer/>;
+  const { resId } = useParams();
+
+  const menu = useRestaurantMenu(resId);
+
+  if (menu == null) {
+    return <Shimmer />;
   }
-  const {name, costForTwoMessage, cuisines, avgRating}=resInfo?.cards[0]?.card?.card?.info;
-  const {itemCards}=resInfo?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card?.card;
-  console.log(itemCards);
-  
+
+  const { name, cuisines, costForTwoMessage, avgRating } =
+    menu?.cards[2]?.card?.card?.info;
+  const { itemCards } =
+    menu?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card?.card;
+  const categories =
+    menu?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards.filter((c) => {
+      if (
+        c?.card?.card?.["@type"] ===
+        "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
+      ) {
+        return c;
+      }
+    });
+  console.log(categories);
+
   return (
-    
-    <div className="menu">
-      <h1>{name}</h1>
-      <h2>{cuisines.join(" ,")}</h2>
-      <h3>{costForTwoMessage}</h3>
-      <h4>{avgRating}</h4>
-      <h2>Menu</h2>
-      <ul>
-        {
-          itemCards.map((items)=>{
-            return <li key={items?.card?.info?.id}>{items?.card?.info?.name}- {items?.card?.info?.price}</li>
-          })
-        }
-        
-      </ul>
+    <div className="text-center">
+      <h1 className="font-bold text-2xl my-[20px]">{name}</h1>
+      <h2 className="font-bold">{cuisines.join(" ,")}</h2>
+      {/* categories */}
+      {categories.map((c)=>{
+        return <RestaurantCategory key={c.card.card.title} categoryData={c?.card?.card}/>;
+      })}
+      
     </div>
   );
 };

@@ -1,14 +1,16 @@
-import RestaurantCard from "./RestaurantCard";
+import RestaurantCard ,{withTopRatedLabel}from "./RestaurantCard";
 import Shimmer from "./Shimmer";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import useNetStatus from "../utils/useNetStatus";
+
 
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
-  const [searchText,setSearchText]=useState("");
-  const [updatedList,setUpdatedList]=useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [updatedList, setUpdatedList] = useState([]);
   useEffect(() => {
-    if(searchText==""){
+    if (searchText == "") {
       fetchData();
     }
   }, [searchText]);
@@ -18,31 +20,52 @@ const Body = () => {
     );
     const json = await data.json();
     setListOfRestaurants(
-      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants);
-    setUpdatedList(json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants);
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
+        ?.restaurants,
+    );
+    setUpdatedList(
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
+        ?.restaurants,
+    );
   };
-
-
- 
-  return listOfRestaurants.length===0?<Shimmer/>:(
-    <div className="body">
-      <div className="topRatedBtn">
-        <div className="search">
-          <input className="searchBar" type="text" value={searchText} onChange={(e)=>{
-            
+  console.log(listOfRestaurants);
+  const RestaurantCardWithTopRatedLabel=withTopRatedLabel(RestaurantCard);
+  
+  const netStatus = useNetStatus();
+  if (!netStatus) {
+    return <h1>You are Offline</h1>;
+  }
+  return listOfRestaurants.length === 0 ? (
+    <Shimmer />
+  ) : (
+    <div className="bg-red-50">
+      <div className="topRatedBtn flex items-center">
+        <div className="m-4 p-4">
+          <input
+            className="border-solid border-black border-2"
+            type="text"
+            value={searchText}
+            onChange={(e) => {
               setSearchText(e.target.value);
-          }}/>
+            }}
+          />
 
-          <button className="searchBtn" onClick={()=>{
-            const matchRestaurants=listOfRestaurants.filter((res)=>{
-              return res.info.name.toLowerCase().includes(searchText.toLocaleLowerCase());
-              
-            })
-            setUpdatedList(matchRestaurants);
-          }}>Search</button>
+          <button
+            className="px-4 py-0.5 m-4 bg-green-300 hover:cursor-pointer rounded-lg"
+            onClick={() => {
+              const matchRestaurants = listOfRestaurants.filter((res) => {
+                return res.info.name
+                  .toLowerCase()
+                  .includes(searchText.toLocaleLowerCase());
+              });
+              setUpdatedList(matchRestaurants);
+            }}
+          >
+            Search
+          </button>
         </div>
         <button
-          className="filterBtn"
+          className="m-2 px-4 py-0.5 bg-green-300 hover:cursor-pointer rounded-lg"
           onClick={() => {
             //filter logic
             const filteredRestaurants = listOfRestaurants.filter(
@@ -54,9 +77,15 @@ const Body = () => {
           Top Rated restaurants
         </button>
       </div>
-      <div className="restaurantContainer">
+      <div className="flex flex-wrap">
         {updatedList.map((restaurant) => (
-          <Link key={restaurant.info.id} to={"/restaurants/"+restaurant.info.id}><RestaurantCard resData={restaurant.info} /></Link>
+          <Link
+            key={restaurant.info.id}
+            to={"/restaurants/" + restaurant.info.id}
+          >
+            {(restaurant.info.avgRating>4.3)?<RestaurantCardWithTopRatedLabel resData={restaurant.info}/>:<RestaurantCard resData={restaurant.info} />}
+            
+          </Link>
         ))}
       </div>
     </div>
